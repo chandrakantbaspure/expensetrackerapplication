@@ -1,54 +1,59 @@
-package com.nitor.ems.controller;
+package com.nitor.expensetrackerapplication.controller;
 
-import com.nitor.ems.exception.UserAlreadyExist;
-import com.nitor.ems.exception.UserInvalidException;
-import com.nitor.ems.exception.UserNotFoundException;
-import com.nitor.ems.model.User;
-import com.nitor.ems.service.UserService;
+import com.nitor.expensetrackerapplication.dto.UserDto;
+import com.nitor.expensetrackerapplication.exception.UserInvalidException;
+import com.nitor.expensetrackerapplication.exception.UserNotFoundException;
+import com.nitor.expensetrackerapplication.model.User;
+import com.nitor.expensetrackerapplication.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@CrossOrigin("*")
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
         this.userService = userService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User user) {
-        User existingUser = userService.getUserByEmail(user.getEmail());
+    public ResponseEntity<UserDto> login(@RequestBody User user) {
+        log.info("Login request received for user: {}", user.getUsername());
+        UserDto existingUser = userService.getUserByUsername(user.getUsername());
         if (existingUser == null) {
             throw new UserNotFoundException("User not found");
         }
-        User authenticatedUser = userService.authenticate(user);
-        if (authenticatedUser == null || !authenticatedUser.getPassword().equals(user.getPassword()) || !authenticatedUser.getEmail().equals(user.getEmail())) {
+        UserDto authenticatedUser = userService.loginUser(user);
+        if (authenticatedUser == null || !authenticatedUser.getPassword().equals(user.getPassword()) || !authenticatedUser.getUsername().equals(user.getUsername())) {
             throw new UserInvalidException("Invalid email or password");
         }
         return ResponseEntity.ok(authenticatedUser);
     }
 
 
-    @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody User user) {
-        User existingUser = userService.getUserByEmail(user.getEmail());
-        if (existingUser != null) {
-            throw new UserAlreadyExist("User with email " + user.getEmail() + " already exists");
-        }
-        User newUser = userService.signup(user);
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> register(@RequestBody User user) {
+        log.info("Registration request received for user: {}", user.getUsername());
+        UserDto newUser = userService.registerUser(user);
         return ResponseEntity.status(201).body(newUser);
     }
 
-    @GetMapping("/user/{emailId}")
-    public ResponseEntity<User> getUserDetails(@PathVariable String emailId) {
+    @GetMapping("/user/{username}")
+    public ResponseEntity<UserDto> getUserDetails(@PathVariable String username) {
         try {
-            User user = userService.getUserByEmail(emailId);
+            UserDto user = userService.getUserByUsername(username);
             if (user == null) {
                 throw new UserNotFoundException("User not found");
             }

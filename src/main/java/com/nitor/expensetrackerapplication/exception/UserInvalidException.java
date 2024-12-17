@@ -1,4 +1,4 @@
-package com.nitor.ems.exception;
+package com.nitor.expensetrackerapplication.exception;
 
 public class UserInvalidException extends RuntimeException {
     public UserInvalidException(String message) {

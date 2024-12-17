@@ -1,4 +1,4 @@
-package com.nitor.ems.exception;
+package com.nitor.expensetrackerapplication.exception;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -9,13 +9,17 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(EmployeeNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleErrorResponse(EmployeeNotFoundException ex) {
+    
+    @ExceptionHandler(ExpenseNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleErrorResponse(ExpenseNotFoundException ex) {
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date().toString());
@@ -40,15 +44,6 @@ public class GlobalExceptionHandler {
         errorResponse.setMessage(ex.getMessage());
         errorResponse.setStatus(HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(EmployeeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMismatchErrorResponse(EmployeeMismatchException ex) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date().toString());
-        errorResponse.setMessage(ex.getMessage());
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserAlreadyExist.class)

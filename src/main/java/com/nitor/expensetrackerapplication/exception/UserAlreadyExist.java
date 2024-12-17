@@ -1,4 +1,4 @@
-package com.nitor.ems.exception;
+package com.nitor.expensetrackerapplication.exception;
 
 public class UserAlreadyExist extends RuntimeException{
     public UserAlreadyExist(String message) {

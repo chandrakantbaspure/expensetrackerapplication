@@ -1,7 +1,7 @@
 package com.nitor.expensetrackerapplication.exception;
 
-public class ExpsenseNotFoundException extends RuntimeException{
-    public ExpsenseNotFoundException(String message) {
+public class ExpenseNotFoundException extends RuntimeException{
+    public ExpenseNotFoundException(String message) {
         super(message);
     }
 }
